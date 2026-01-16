@@ -1,6 +1,9 @@
+#define _GNU_SOURCE
+
 #include "timing.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <stdint.h>
 #include <time.h>
 #include <dlfcn.h>
@@ -14,13 +17,13 @@
 typedef struct tinfo {
   clock_t start;
   clock_t end;
-  struct tinfo* next = NULL;
+  struct tinfo* next;
 } tinfo_t;
 
 typedef struct {
   char* func_name; /* key for struct hashing */
   uint32_t times_called;
-  tinfo_t* timing = NULL; 
+  tinfo_t* timing; 
   UT_hash_handle hh; /* make the struct hashable */
 } finfo_t;
 
@@ -144,9 +147,9 @@ void __cyg_profile_func_enter (void *this_fn, void *call_site)
      * 4. add the tinfo entry to the finfo entry
      */
     // Step 1
-     char* name = info.dli_sname ? info.dli_sname : "NOT FOUND";
+     const char* name = info.dli_sname ? info.dli_sname : "NOT FOUND";
     finfo_t* finfo;
-    HASH_FIND_STR(table, &name, finfo);
+    HASH_FIND_STR(table, name, finfo);
     // n
     if(finfo == NULL) {
       // need to add it to the table
@@ -186,10 +189,10 @@ void __cyg_profile_func_exit  (void *this_fn, void *call_site)
      
      */
     // Step 1
-    char* name = info.dli_sname ? info.dli_sname : "NOT FOUND";
+    const char* name = info.dli_sname ? info.dli_sname : "NOT FOUND";
     finfo_t* finfo;
     // step 2
-    HASH_FIND_STR(table, &name, finfo);
+    HASH_FIND_STR(table, name, finfo);
     // step 3
     timing_stop(finfo);
 

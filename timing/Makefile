@@ -1,17 +1,15 @@
 CC=gcc
 CFLAGS=-Wall
 
-LINKS=-ldl
-
 SRCS=$(wildcard *.c)
 OBJS=$(SRCS:%.c=%.o)
 
-TGTS=$(SRCS:%.c=%)
+TGT=libhpc.a
 
-all: $(TGTS)
+all: $(TGT)
 
-%: %.o
-	$(CC) $(CFLAGS) $< -o $@
+$(TGT): $(OBJS)
+	ar rcs $@ $<
 
 %.o:%.c
 	$(CC) $(CFLAGS) -c $< -o $@
