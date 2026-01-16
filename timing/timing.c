@@ -44,6 +44,7 @@ void timing_add(finfo_t* finfo)
   // insert onto the head
   tinfo_t* tinfo = malloc(sizeof(*tinfo));
   tinfo->start = start;
+  tinfo->end = -1;
   tinfo->next  = finfo->timing;
   
   finfo->timing = tinfo;
@@ -58,7 +59,12 @@ void timing_stop(finfo_t* finfo)
   // need to get the current time
   clock_t end = clock();
 
-  finfo->timing->end = end;
+  for(tinfo_t* tinfo = finfo->timing; tinfo != NULL; tinfo = tinfo->next) {
+    if(tinfo->end == -1) {
+      tinfo->end = end;
+      break;
+    }
+  }
 }
 
 /**
@@ -68,6 +74,8 @@ void timing_stop(finfo_t* finfo)
 __attribute__ ((no_instrument_function, destructor))
 void timing_kill()
 { 
+  timing_print();
+
   // safely iterate over hash table and remove entries
   finfo_t* finfo, *tmp;
 
@@ -113,10 +121,12 @@ void timing_print()
     printf("%s:\n", finfo->func_name);
     clock_t totalTime = 0;
     for(tinfo_t* tinfo = finfo->timing; tinfo != NULL; tinfo = tinfo->next) {
-      clock_t diff = tinfo->end - tinfo->start;
-      totalTime += diff;
-
-      print_time(diff);
+      if(tinfo->end > -1) {
+        clock_t diff = tinfo->end - tinfo->start;
+        totalTime += diff;
+        
+        print_time(diff);
+      }
     }
     printf("Total Time: ");
     print_time(totalTime);
@@ -148,18 +158,19 @@ void __cyg_profile_func_enter (void *this_fn, void *call_site)
      * 4. add the tinfo entry to the finfo entry
      */
     // Step 1
-     const char* name = info.dli_sname ? info.dli_sname : "NOT FOUND";
+     const char* name = info.dli_sname != NULL ? info.dli_sname : "NOT FOUND";
     finfo_t* finfo;
     HASH_FIND_STR(table, name, finfo);
     // n
     if(finfo == NULL) {
       // need to add it to the table
       finfo = malloc(sizeof(*finfo));
+      finfo->func_name = malloc(sizeof(char) * strlen(name) + 1);
       strcpy(finfo->func_name, name);
-      finfo->times_called = -1;
+      finfo->times_called = 0;
       timing_add(finfo);
       // HASH_ADD_KEYPTR(hh_name, head, key_ptr, key_len, item_ptr)
-      HASH_ADD_KEYPTR(hh, table, &finfo->func_name, strlen(finfo->func_name), finfo);
+      HASH_ADD_KEYPTR(hh, table, finfo->func_name, strlen(finfo->func_name), finfo);
     }
     // y / step 2
     finfo->times_called++;
@@ -190,7 +201,7 @@ void __cyg_profile_func_exit  (void *this_fn, void *call_site)
      
      */
     // Step 1
-    const char* name = info.dli_sname ? info.dli_sname : "NOT FOUND";
+    const char* name = info.dli_sname != NULL ? info.dli_sname : "NOT FOUND";
     finfo_t* finfo;
     // step 2
     HASH_FIND_STR(table, name, finfo);
