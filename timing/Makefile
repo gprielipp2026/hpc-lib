@@ -4,7 +4,7 @@ CFLAGS=-Wall
 SRCS=$(wildcard *.c)
 OBJS=$(SRCS:%.c=%.o)
 
-TGT=libhpc.a
+TGT=libtiming.a
 
 all: $(TGT)
 

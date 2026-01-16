@@ -5,34 +5,32 @@ Developed by George Prielipp for SI458 - High Performance Computing.
 ## Installation
 
 1. Determine your include path
-   1. `g++ -v -x c -E /dev/null`
+   1. `gcc -v -x c -E /dev/null`
    2. Look for "`#include <...> search starts here:`"
 2. `git clone <this library>` in one of the directories listed that you have access to.
+3. Run `make` in `/hpc-lib`
+4. Modify your `Makefile` in your project to include:
+   1. `LDFLAGS=-L<location you installed>/hpc-lib/ -rdynamic`
+   2. `LDLIBS=-lhpc`
+   3. `CFLAGS=-finstrument-functions`
 
 ## Use
 
 ```c
 
-#include <hpc-lib/timing.h>
+#include <hpc-lib/timing/timing.h>
 
 ...
-
-// initialize the library
-ttable_t table;
-timing_start(&table);
 
 // do the HPC lab / call functions
 foo();
 bar();
 bat();
 
-// stop the library
-timing_stop(&table);
+// display results to the screen - can be done at any point
+// however: the library automatically calls this at the end of the program
+// meaning there is no reason to call this function
+timing_print();
 
-// display results to the screen
-timing_print(&table);
-
-// free any memory the library used
-timing_free(&table);
 
 ```

@@ -103,8 +103,8 @@ void timing_kill()
  */
 __attribute((no_instrument_function)) 
 void print_time(clock_t time) {
-  int millis = time * 1000 / CLOCKS_PER_SEC;
-  printf("Time: %d sec %d millisec\n", millis/1000, millis%1000);
+  long long millis = time * 1000 / CLOCKS_PER_SEC;
+  printf("Time: %lld sec %lld millisec\n", millis/1000, millis%1000);
 }
 
 /**
@@ -117,22 +117,25 @@ void timing_print()
 
   for(finfo = table; finfo != NULL; finfo = finfo->hh.next) {
     // need to print the timing information out now
-    printf("---------------\n");
-    printf("%s:\n", finfo->func_name);
+    printf("\n%s:\n", finfo->func_name);
+    printf("------------------\n");
+    
     clock_t totalTime = 0;
     for(tinfo_t* tinfo = finfo->timing; tinfo != NULL; tinfo = tinfo->next) {
       if(tinfo->end > -1) {
         clock_t diff = tinfo->end - tinfo->start;
-        totalTime += diff;
         
-        print_time(diff);
+        totalTime += diff;
+
+        if(finfo->times_called <= 5) {
+          print_time(diff);
+        }
       }
     }
     printf("Total Time: ");
     print_time(totalTime);
     printf("Average Time: ");
     print_time(totalTime / finfo->times_called);
-    printf("\n");
   }
 }
 
