@@ -1,6 +1,8 @@
 CC=gcc
 CFLAGS=-Wall
 
+LINKS=-ldl
+
 SRCS=$(wildcard *.c)
 OBJS=$(SRCS:%.c=%.o)
 
