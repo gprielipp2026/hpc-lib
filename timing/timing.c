@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <time.h>
 #include <dlfcn.h>
+#include <string.h>
 
 // UTHASH
 #include "uthash/include/uthash.h"
