@@ -1,0 +1,3 @@
+[submodule "timing/uthash"]
+	path = timing/uthash
+	url = git@github.com:troydhanson/uthash.git

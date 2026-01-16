@@ -13,7 +13,7 @@ Developed by George Prielipp for SI458 - High Performance Computing.
 
 ```c
 
-#include <hpc/timing.h>
+#include <hpc-lib/timing.h>
 
 ...
 
