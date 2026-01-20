@@ -11,8 +11,6 @@ TARGET  := libhpc.a
 .PHONY: all clean $(SUBDIRS)
 
 all: $(TARGET)
-	echo $(SUBDIRS)
-	echo $(SUBLIBS)
 
 # 4. Rule to build the sub-libraries
 #    This triggers the Makefile inside each subdirectory
