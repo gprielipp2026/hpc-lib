@@ -171,7 +171,7 @@ void __cyg_profile_func_enter (void *this_fn, void *call_site)
       finfo->func_name = malloc(sizeof(char) * strlen(name) + 1);
       strcpy(finfo->func_name, name);
       finfo->times_called = 0;
-      timing_add(finfo);
+      finfo->timing = NULL;
       // HASH_ADD_KEYPTR(hh_name, head, key_ptr, key_len, item_ptr)
       HASH_ADD_KEYPTR(hh, table, finfo->func_name, strlen(finfo->func_name), finfo);
     }
