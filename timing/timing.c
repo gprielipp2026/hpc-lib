@@ -84,17 +84,17 @@ void timing_kill()
     HASH_DEL(table, finfo);
 
     // free memory in finfo
-    free(finfo->func_name);
+    if(finfo->func_name != NULL) free(finfo->func_name);
     for(tinfo_t* tinfo = finfo->timing; tinfo != NULL; ) {
       tinfo_t* next = tinfo->next;
 
-      free(tinfo);
+      if(tinfo != NULL) free(tinfo);
 
       tinfo = next;
     }
 
     // free finfo
-    free(finfo);
+    if(finfo != NULL) free(finfo);
   }
 }
 
